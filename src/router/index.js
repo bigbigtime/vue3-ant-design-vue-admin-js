@@ -1,9 +1,16 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 const routes = [
+  // 登录 
   {
     path: "/",
     name: "Login",
     component: () => import("../views/acount/Login.vue")
+  },
+  // 注册 
+  {
+    path: "/register",
+    name: "Register",
+    component: () => import("../views/acount/Register.vue")
   },
   {
     path: "/about",

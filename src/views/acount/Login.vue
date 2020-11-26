@@ -29,7 +29,7 @@
       </a-form>
       <div class="text-center fs-12">
         <a href="" class="color-white">忘记密码</a> | 
-        <a href="" class="color-white">注册</a>
+        <router-link to="/register">注册</router-link>
       </div>
     </div>
   </div>
