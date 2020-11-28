@@ -14,20 +14,20 @@
           <a-input v-model:value="account_form.username" type="text" autocomplete="off" />
         </a-form-item>
 
-        <a-form-item>
+        <a-form-item name="password">
           <label>密码</label>
-          <a-input v-model="account_form.password" type="password" utocomplete="off" />
+          <a-input v-model:value="account_form.password" type="password" utocomplete="off" />
         </a-form-item>
 
-        <a-form-item>
+        <a-form-item name="passwords">
           <label>确认密码</label>
-          <a-input v-model="account_form.passwords" type="password" utocomplete="off" />
+          <a-input v-model:value="account_form.passwords" type="password" utocomplete="off" />
         </a-form-item>
 
-        <a-form-item>
+        <a-form-item name="code">
           <label>验证码</label>
           <a-row :gutter="15">
-            <a-col :span="14"><a-input v-model="account_form.code" type="password" utocomplete="off" /></a-col>
+            <a-col :span="14"><a-input maxlength="6" v-model:value="account_form.code" type="text" utocomplete="off" /></a-col>
             <a-col :span="10"><a-button type="primary" block>获取验证码</a-button></a-col>
           </a-row>
           
@@ -54,7 +54,7 @@
 
 <script>
 // 导入验证类的方法
-import { checkPhone } from "@/utils/verification";
+import { checkPhone, checkPassword as password, checkCode as code } from "@/utils/verification";
 import { onMounted, reactive, toRefs, ref } from "vue";
 // 局部组件（导入）
 import Captcha from "@/components/Captcha";
@@ -63,10 +63,50 @@ export default {
   components: { Captcha },
   setup(props){
     const checkUsername = async (rule, value, callback) => {
+      console.log(rule)
       if (!value) {
         return Promise.reject('请输入用户名');            //不存在的情况
       }else if(!checkPhone(value)){
         return Promise.reject('请输入11位数字的手机号');  //手机号错误的情况
+      }else{
+        // callback();
+        return Promise.resolve();
+      }
+    };
+    /** 检验密码 */
+    const checkPassword = async (rule, value, callback) => {
+      const passwords = formConfig.account_form.passwords;
+      if (!value) {
+        return Promise.reject('请输入密码');            //不存在的情况
+      }else if(!password(value)){
+        return Promise.reject('请输入6~20位的，数字+英文');  //密码错误的情况
+      }else if(passwords && value && (passwords !== value)){  // 必须是两个密码都存在的情况下，才会检测密码是否一致。否则不检测
+        return Promise.reject('两次密码不一致');  //密码错误的情况
+      }else{
+        // callback();
+        return Promise.resolve();
+      }
+    };
+    /** 检验重置密码 */
+    const checkPasswords = async (rule, value, callback) => {
+      const pas = formConfig.account_form.password;
+      if (!value) {
+        return Promise.reject('请再次输入密码');            //不存在的情况
+      }else if(!password(value)){
+        return Promise.reject('请输入6~20位的，数字+英文');  //密码错误的情况
+      }else if(pas && value && (pas !== value)){
+        return Promise.reject('两次密码不一致');  //密码错误的情况
+      }else{
+        // callback();
+        return Promise.resolve();
+      }
+    };
+    /** 检验验证码 */
+    const checkCode = async (rule, value, callback) => {
+      if (!value) {
+        return Promise.reject('请输入验证码');            //不存在的情况
+      }else if(!code(value)){
+        return Promise.reject('请输入6位的数字+英文');  //密码错误的情况
       }else{
         // callback();
         return Promise.resolve();
@@ -84,14 +124,17 @@ export default {
         code: ""
       },
       rules_form: {
-        username: [{ validator: checkUsername, trigger: 'change' }]
+        username: [{ validator: checkUsername, trigger: 'change' }],
+        password: [{ validator: checkPassword, trigger: 'change' }],
+        passwords: [{ validator: checkPasswords, trigger: 'change' }],
+        code: [{ validator: checkCode, trigger: 'change' }]
       }
     })
     const data = toRefs(formConfig);
 
     // 提交表单
-    const handleFinish = () => {
-      alert(111)
+    const handleFinish = (value) => {
+      console.log(value)
     }
 
     onMounted(() => {})
