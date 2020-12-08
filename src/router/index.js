@@ -18,10 +18,17 @@ const routes = [
     name: "Forget",
     component: () => import("../views/acount/Forget.vue")
   },
+  // 管理后台 - 首页
   {
-    path: "/about",
-    name: "About",
-    component: () => import("../views/About.vue")
+    path: "/index",
+    name: "Index",
+    component: () => import("../views/layout/Index.vue")
+  },
+  // 管理后台 - 信息管理
+  {
+    path: "/newsIndex",
+    name: "NewsIndex",
+    component: () => import("../views/layout/Index.vue")
   },
   {
     path: "/news",
