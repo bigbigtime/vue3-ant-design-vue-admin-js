@@ -1,5 +1,5 @@
 <template>
-    <div>内容区</div>
+    <router-view />
 </template>
 <script>
 export default {

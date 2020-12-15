@@ -19,7 +19,7 @@
 <script>
 import LayoutAside from "./components/Aside";
 import LayoutHeader from "./components/Header";
-import LayoutMain from "./components/Aside";
+import LayoutMain from "./components/Main";
 import { reactive, toRefs } from 'vue';
 export default {
     name: "Layout",
