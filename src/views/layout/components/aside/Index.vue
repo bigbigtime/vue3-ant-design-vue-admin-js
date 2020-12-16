@@ -4,7 +4,6 @@
         v-model:selectedKeys="data.selectedKeys"
         mode="inline"
         theme="dark"
-        :inline-collapsed="collapsed"
     >
         <template v-for="item in rotuers">
             <template v-if="!item.hidden">
@@ -12,14 +11,7 @@
                 <a-menu-item v-if="!item.children" :key="item.path">{{ item.meta && item.meta.title }}</a-menu-item>
                 
                 <!--这里是子级-->
-                <a-sub-menu v-else :key="item.path">
-                    <template #title>
-                        <span>{{ item.meta && item.meta.title }}</span>
-                    </template>
-                    <template v-if="item.children.length">
-                        <a-menu-item :key="child.path" v-for="child in item.children">{{ child.meta && child.meta.title }}</a-menu-item>
-                    </template>
-                </a-sub-menu>
+                <Menu v-else aaa="11" :menu="item" />
             </template>
         </template>
         
@@ -29,8 +21,11 @@
 import { reactive } from "vue";
 // 路由
 import { useRoute, useRouter } from "vue-router";
+// 组件
+import Menu from "./Menu";
 export default {
     name: "Aside",
+    components: { Menu },
     setup(){
         const { options } = useRouter();
         // 路由
@@ -38,7 +33,8 @@ export default {
         // 数据
         const data = reactive({
             selectedKeys: ['2'],
-            openKeys: ['/adminIndex']
+            openKeys: ['/adminIndex'],
+            abc: 11
         })
 
         return {

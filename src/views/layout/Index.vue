@@ -1,6 +1,6 @@
 <template>
     <a-layout id="layout-main">
-        <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
+        <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible width="500">
             <LayoutAside />
         </a-layout-sider>
 
@@ -17,7 +17,7 @@
     </a-layout>
 </template>
 <script>
-import LayoutAside from "./components/Aside";
+import LayoutAside from "./components/aside/Index";
 import LayoutHeader from "./components/Header";
 import LayoutMain from "./components/Main";
 import { reactive, toRefs } from 'vue';

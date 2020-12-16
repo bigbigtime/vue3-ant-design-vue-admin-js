@@ -55,7 +55,53 @@ const routes = [
         meta: {
           title: "角色管理"
         },
-        component: () => import("../views/admin/Role.vue")
+        component: () => import("../views/admin/Role.vue"),
+        children: [
+          {
+            path: "/a",
+            name: "A",
+            meta: {
+              title: "角色管理A"
+            },
+            component: () => import("../views/admin/User.vue"),
+            children: [
+              {
+                path: "/aa",
+                name: "AA",
+                meta: {
+                  title: "角色管理AA-1"
+                },
+                component: () => import("../views/admin/User.vue"),
+                children: [
+                  {
+                    path: "/aa",
+                    name: "AA",
+                    meta: {
+                      title: "角色管理AA-1-1"
+                    },
+                    component: () => import("../views/admin/User.vue")
+                  }
+                ]
+              },
+              {
+                path: "/aa",
+                name: "AA",
+                meta: {
+                  title: "角色管理AA-2"
+                },
+                component: () => import("../views/admin/User.vue")
+              }
+            ]
+          },
+          {
+            path: "/b",
+            name: "B",
+            meta: {
+              title: "角色管理B"
+            },
+            component: () => import("../views/admin/User.vue")
+          }
+        ]
       },
       {
         path: "/user",
