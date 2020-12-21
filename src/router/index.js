@@ -35,7 +35,8 @@ const routes = [
     path: "/index",
     name: "Index",
     meta: {
-      title: "首页"
+      title: "首页",
+      icon: "icon-aside-home"
     },
     component: () => import("../views/layout/Index.vue")
   },
@@ -45,7 +46,7 @@ const routes = [
     name: "AdminIndex",
     meta: {
       title: "管理总台",
-      icon: "111"
+      icon: "icon-aside-console"
     },
     component: () => import("../views/layout/Index.vue"),
     children: [
@@ -56,52 +57,6 @@ const routes = [
           title: "角色管理"
         },
         component: () => import("../views/admin/Role.vue"),
-        children: [
-          {
-            path: "/a",
-            name: "A",
-            meta: {
-              title: "角色管理A"
-            },
-            component: () => import("../views/admin/User.vue"),
-            children: [
-              {
-                path: "/aa",
-                name: "AA",
-                meta: {
-                  title: "角色管理AA-1"
-                },
-                component: () => import("../views/admin/User.vue"),
-                children: [
-                  {
-                    path: "/aa",
-                    name: "AA",
-                    meta: {
-                      title: "角色管理AA-1-1"
-                    },
-                    component: () => import("../views/admin/User.vue")
-                  }
-                ]
-              },
-              {
-                path: "/aa",
-                name: "AA",
-                meta: {
-                  title: "角色管理AA-2"
-                },
-                component: () => import("../views/admin/User.vue")
-              }
-            ]
-          },
-          {
-            path: "/b",
-            name: "B",
-            meta: {
-              title: "角色管理B"
-            },
-            component: () => import("../views/admin/User.vue")
-          }
-        ]
       },
       {
         path: "/user",
@@ -117,9 +72,28 @@ const routes = [
     path: "/news",
     name: "News",
     meta: {
-      title: "信息管理"
+      title: "信息管理",
+      icon: "icon-aside-informtion"
     },
-    component: () => import("../views/News.vue")
+    component: () => import("../views/layout/Index.vue"),
+  },
+  {
+    path: "/user",
+    name: "User",
+    meta: {
+      title: "用户管理",
+      icon: "icon-aside-user"
+    },
+    component: () => import("../views/layout/Index.vue"),
+  },
+  {
+    path: "/product",
+    name: "Product",
+    meta: {
+      title: "产品管理",
+      icon: "icon-aside-product"
+    },
+    component: () => import("../views/layout/Index.vue"),
   }
 ];
 
