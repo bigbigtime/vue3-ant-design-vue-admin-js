@@ -2,7 +2,7 @@
     <a-sub-menu :key="menu.path">
         <template #title>
             <span>
-                <i class="icon icon-size-21 mb--5" :class="menu.meta && menu.meta.icon"></i> 
+                <SvgIcon :iconName="menu.meta && menu.meta.icon" className="aside-svg"/>
                 {{ menu.meta && menu.meta.title }}
             </span>
         </template>
@@ -19,8 +19,11 @@
     </a-sub-menu>
 </template>
 <script>
+// 组件
+import SvgIcon from "@/components/Svgicon";
 export default {
     name: "Menu",
+    components: { SvgIcon },
     props: {
         menu: {
             type: Object,  // array

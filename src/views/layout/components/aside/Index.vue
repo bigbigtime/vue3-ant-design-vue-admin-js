@@ -16,7 +16,7 @@
                 <!--这里是一级-->
                 <a-menu-item v-if="!item.children" :key="item.path">
                     <router-link :to="item.path">
-                        <i class="icon icon-size-21 mb--5" :class="item.meta && item.meta.icon"></i>
+                        <SvgIcon :iconName="item.meta && item.meta.icon" className="aside-svg"></SvgIcon>
                         {{ item.meta && item.meta.title }}
                     </router-link>
                 </a-menu-item>
@@ -33,9 +33,10 @@ import { reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 // 组件
 import Menu from "./Menu";
+import SvgIcon from "@/components/Svgicon";
 export default {
     name: "Aside",
-    components: { Menu },
+    components: { Menu, SvgIcon },
     setup(){
         const { options } = useRouter();
         // 路由
