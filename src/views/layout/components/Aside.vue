@@ -1,6 +1,7 @@
 <template>
     <h1 id="logo">
-        <img :src="data.logo" alt="手把手撸码前端 1371374684" />
+        <img v-if="collapsed" :src="data.logo_min" alt="手把手撸码前端 1371374684" />
+        <img v-else :src="data.logo" alt="手把手撸码前端 1371374684" />
     </h1>
     <a-menu
         class="aside-menu"
@@ -16,8 +17,10 @@
                 <!--这里是一级-->
                 <a-menu-item v-if="!item.children" :key="item.path">
                     <router-link :to="item.path">
-                        <SvgIcon :iconName="item.meta && item.meta.icon" className="aside-svg"></SvgIcon>
-                        {{ item.meta && item.meta.title }}
+                        <span class="anticon">
+                            <svg-icon :iconName="item.meta && item.meta.icon" className="aside-svg"></svg-icon>
+                        </span>
+                        <span>{{ item.meta && item.meta.title }}</span>
                     </router-link>
                 </a-menu-item>
                 
@@ -33,10 +36,15 @@ import { reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 // 组件
 import Menu from "./Menu";
-import SvgIcon from "@/components/Svgicon";
 export default {
     name: "Aside",
-    components: { Menu, SvgIcon },
+    components: { Menu },
+    props: {
+        collapsed: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup(){
         const { options } = useRouter();
         // 路由
@@ -44,8 +52,9 @@ export default {
         // 数据
         const data = reactive({
             selectedKeys: localStorage.getItem("selectedKeys") ? [localStorage.getItem("selectedKeys")] : [],
-            openKeys: localStorage.getItem("openKeys") ? [localStorage.getItem("openKeys")] : [],
-            logo: require("@/assets/images/logo.png")
+            openKeys: localStorage.getItem("openKeys") ? JSON.parse(localStorage.getItem("openKeys")) : [],
+            logo: require("@/assets/images/logo.png"),
+            logo_min: require("@/assets/images/logo-min.png"),
         })
 
         // 选择菜单
@@ -56,7 +65,7 @@ export default {
         // 展开/关闭菜单
         const openMenu = (openKeys) => {
             data.openKeys = openKeys;
-            localStorage.setItem("openKeys", openKeys) // 设置
+            localStorage.setItem("openKeys", JSON.stringify(openKeys)) // 设置
         }
 
         return {

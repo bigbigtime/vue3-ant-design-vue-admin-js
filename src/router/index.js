@@ -16,7 +16,8 @@ const routes = [
     name: "Register",
     hidden: true,
     meta: {
-      title: "注册"
+      title: "注册",
+      hidden: true,
     },
     component: () => import("../views/acount/Register.vue")
   },
@@ -57,6 +58,42 @@ const routes = [
           title: "角色管理"
         },
         component: () => import("../views/admin/Role.vue"),
+        children: [
+          {
+            path: "/aaa",
+            name: "Aaa",
+            meta: {
+              title: "AAA"
+            },
+            component: () => import("../views/admin/Role.vue"),
+            children: [
+              {
+                path: "/aaa-1",
+                name: "Aaa",
+                meta: {
+                  title: "AAA-1"
+                },
+                component: () => import("../views/admin/Role.vue"),
+              },
+              {
+                path: "/bbb-1",
+                name: "Bbb",
+                meta: {
+                  title: "AAA-2"
+                },
+                component: () => import("../views/admin/User.vue")
+              },
+            ]
+          },
+          {
+            path: "/bbb",
+            name: "Bbb",
+            meta: {
+              title: "BBB"
+            },
+            component: () => import("../views/admin/User.vue")
+          },
+        ]
       },
       {
         path: "/user",
@@ -78,11 +115,11 @@ const routes = [
     component: () => import("../views/layout/Index.vue"),
   },
   {
-    path: "/user",
-    name: "User",
+    path: "/member",
+    name: "Member",
     meta: {
-      title: "用户管理",
-      icon: "user"
+      title: "会员管理",
+      icon: "member"
     },
     component: () => import("../views/layout/Index.vue"),
   },
