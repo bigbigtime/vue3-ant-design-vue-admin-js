@@ -39,7 +39,17 @@ const routes = [
       title: "首页",
       icon: "home"
     },
-    component: () => import("../views/layout/Index.vue")
+    component: () => import("../views/layout/Index.vue"),
+    children: [
+      {
+        path: "/home",
+        name: "Home",
+        meta: {
+          title: "首页"
+        },
+        component: () => import("../views/home/Index.vue")
+      }
+    ]
   },
   // 管理后台 - 管理总台
   {
@@ -57,43 +67,7 @@ const routes = [
         meta: {
           title: "角色管理"
         },
-        component: () => import("../views/admin/Role.vue"),
-        children: [
-          {
-            path: "/aaa",
-            name: "Aaa",
-            meta: {
-              title: "AAA"
-            },
-            component: () => import("../views/admin/Role.vue"),
-            children: [
-              {
-                path: "/aaa-1",
-                name: "Aaa",
-                meta: {
-                  title: "AAA-1"
-                },
-                component: () => import("../views/admin/Role.vue"),
-              },
-              {
-                path: "/bbb-1",
-                name: "Bbb",
-                meta: {
-                  title: "AAA-2"
-                },
-                component: () => import("../views/admin/User.vue")
-              },
-            ]
-          },
-          {
-            path: "/bbb",
-            name: "Bbb",
-            meta: {
-              title: "BBB"
-            },
-            component: () => import("../views/admin/User.vue")
-          },
-        ]
+        component: () => import("../views/admin/Role.vue")
       },
       {
         path: "/user",
@@ -113,6 +87,7 @@ const routes = [
       icon: "informtion"
     },
     component: () => import("../views/layout/Index.vue"),
+    children: []
   },
   {
     path: "/member",
@@ -122,6 +97,7 @@ const routes = [
       icon: "member"
     },
     component: () => import("../views/layout/Index.vue"),
+    children: []
   },
   {
     path: "/product",
@@ -131,6 +107,7 @@ const routes = [
       icon: "product"
     },
     component: () => import("../views/layout/Index.vue"),
+    children: []
   }
 ];
 
