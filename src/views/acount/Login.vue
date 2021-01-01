@@ -27,6 +27,9 @@
           </a-button>
         </a-form-item>
       </a-form>
+      <a-button type="primary" @click="submit">
+            测试axios
+      </a-button>
       <div class="text-center fs-12">
         <router-link to="/forget" class="color-white">忘记密码</router-link> | 
         <router-link to="/register" class="color-white">注册</router-link>
@@ -36,13 +39,16 @@
 </template>
 
 <script>
-import { onMounted, reactive, toRefs, ref } from "vue";
+import { onMounted, reactive, toRefs, ref, getCurrentInstance } from "vue";
 // 局部组件（导入）
 import Captcha from "@/components/Captcha";
 export default {
   name: "Login",
   components: { Captcha },
   setup(props){
+    // ctx 相当于 vue2.0 的 this 对象
+    const { ctx } = getCurrentInstance();
+
     const formConfig = reactive({  // 类似于JSON对象的语法
       layout: {
         labelCol: { span: 10 },
@@ -53,7 +59,12 @@ export default {
 
     onMounted(() => {})
 
+    const submit = () => {
+      ctx.$axios.post("getSms")
+    }
+
     return {
+      submit,
       ...data
     }
   }

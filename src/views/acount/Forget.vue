@@ -65,13 +65,15 @@
 import { message } from 'ant-design-vue';
 // 导入验证类的方法
 import { checkPhone, checkPassword as password, checkCode as code } from "@/utils/verification";
-import { onMounted, reactive, toRefs, ref } from "vue";
+import { onMounted, reactive, toRefs, ref, getCurrentInstance } from "vue";
 // 局部组件（导入）
 import Captcha from "@/components/Captcha";
 export default {
   name: "Login",
   components: { Captcha },
   setup(props){
+    const { ctx } = getCurrentInstance();
+    ctx.$axios.post("getSms")
     const checkUsername = async (rule, value, callback) => {
       console.log(rule)
       if (!value) {
