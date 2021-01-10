@@ -25,5 +25,20 @@ module.exports = {
                 prependData: `@import "./src/styles/main.scss";`
             }
         }
+    },
+    devServer: {
+        open: false,    // 运行项目后是否自动打开
+        host: "0.0.0.0",   // 可以让外部访问
+        port: 8000,
+        proxy: {
+            '/devApi': {
+                target: 'http://www.web-jshtml.cn/api/vue3',
+                ws: false,            // webstock
+                changeOrigin: true,    // 是否开启跨域
+                pathRewrite: {
+                    "^/devApi": ''        // 查找开头为/api的字符替换成“空字符串”   /api/getCode
+                } 
+            }
+        }
     }
 }

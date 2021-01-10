@@ -3,7 +3,7 @@ import service from "@/utils/request.js";
 
 export function GetCode(data){
     return service.request({
-        url: '/user',
+        url: '/getCode/',
         method: 'post',
         data,
     })
