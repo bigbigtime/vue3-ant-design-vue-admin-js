@@ -9,14 +9,27 @@ export function GetCode(data){
     })
 }
 
+/**
+ * 帐户体系 - 登录
+ */
+export function AccountLogin(data){
+    return service.request({
+        url: process.env.VUE_APP_ACCOUNT_APIURL + 'http://account-test.web-jshtml.cn/login/',
+        method: 'post',
+        data,
+    })
+}
+
+/**
+ * 用户体系 - 登录
+ */
+export function UserList(data){
+    return service.request({
+        url: process.env.VUE_APP_USER_APIURL + '/list/',
+        method: 'post',
+        data,
+    })
+}
 
 
 
-// post请求
-// service.request({
-//     url: '/user',
-//     method: 'post', // default
-//     data: {  // get 请求
-//         ID: 12345
-//     },
-// })

@@ -1,7 +1,7 @@
 const path = require("path");
 // vue.config.js
 module.exports = {
-    publicPath: process.env.NODE_ENV === 'production' ? '' : '/',
+    publicPath: process.env.NODE_ENV === 'production' ? '' : './',
     // 构建项目生成的目录
     outputDir: process.env.NODE_ENV === 'production' ? 'dist' : 'devDist',
     // 关闭语法的自动检测
@@ -31,12 +31,12 @@ module.exports = {
         host: "0.0.0.0",   // 可以让外部访问
         port: 8000,
         proxy: {
-            '/devApi': {
-                target: 'http://www.web-jshtml.cn/api/vue3',
+            [process.env.VUE_APP_FLAG]: {
+                target: process.env.VUE_APP_APIURL,
                 ws: false,            // webstock
                 changeOrigin: true,    // 是否开启跨域
                 pathRewrite: {
-                    "^/devApi": ''        // 查找开头为/api的字符替换成“空字符串”   /api/getCode
+                    [`^${process.env.VUE_APP_FLAG}`]: ''        // 查找开头为/api的字符替换成“空字符串”   /api/getCode
                 } 
             }
         }
