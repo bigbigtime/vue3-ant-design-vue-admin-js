@@ -62,8 +62,100 @@ export default {
     onMounted(() => {})
 
     const submit = () => {
-      GetCode({id:"11", name:"vv"});
+      GetCode({id:"11", name:"vv"}).then(response => {
+
+      })
     }
+    /**
+     * Promise 对象理解 
+     */
+    // const handlerPromise = () => {
+    //   return new Promise((resolve, reject) => {
+    //     resolve("总体");
+    //   })
+    // }
+
+    // const promise_1 = () => {
+    //   return new Promise((resolve, reject) => {
+    //     setTimeout(() => {
+    //       resolve("11111")
+    //     }, 2000)
+    //   })
+    // }
+
+    // const promise_2 = () => {
+    //   return new Promise((resolve, reject) => {
+    //     setTimeout(() => {
+    //       resolve("2222")
+    //     }, 1000)
+    //   })
+    // }
+
+    // const promise_3 = () => {
+    //   return new Promise((resolve, reject) => {
+    //     setTimeout(() => {
+    //       resolve("33333")
+    //     }, 3000)
+    //   })
+    // }
+
+
+    // Promise.race([promise_1(), promise_2(), promise_3()]).then(res => {
+    //   console.log(res)
+    // }).catch(err => {
+    //   console.log(err);
+    // })
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     return {
       submit,
