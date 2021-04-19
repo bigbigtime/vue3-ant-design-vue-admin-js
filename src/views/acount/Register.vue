@@ -9,9 +9,9 @@
         :rules="rules_form"
         @finish="handleFinish"
       >
-        <a-form-item name="username">
+        <a-form-item name="username" ref="username">
           <label>用户名</label>
-          <a-input v-model:value="account_form.username" type="text" autocomplete="off" />
+          <a-input v-model:value="account_form.username" type="text" :disabled="input_diabled.username" autocomplete="off" @change="() => {$refs.username.onFieldChange()}" />
         </a-form-item>
 
         <a-form-item name="password">
@@ -33,7 +33,7 @@
               type="primary" 
                 @click="getCode"
                 block 
-                :disabled="button_disabled" 
+                :disabled="disabled_code_button" 
                 :loading="button_loading">
               {{ button_text }}
               </a-button>
@@ -63,6 +63,8 @@
 <script>
 // antdesign
 import { message } from 'ant-design-vue';
+// API
+import { ChekcUsername } from "@/api/account";
 // 导入验证类的方法
 import { checkPhone, checkPassword as password, checkCode as code } from "@/utils/verification";
 import { onMounted, reactive, toRefs, ref } from "vue";
@@ -73,13 +75,15 @@ export default {
   components: { Captcha },
   setup(props){
     const checkUsername = async (rule, value, callback) => {
-      console.log(rule)
       if (!value) {
         return Promise.reject('请输入用户名');            //不存在的情况
       }else if(!checkPhone(value)){
+        dataItem.disabled_code_button = true;
         return Promise.reject('请输入11位数字的手机号');  //手机号错误的情况
       }else{
         // callback();
+        // checkUsernameFn();
+        dataItem.disabled_code_button = false;
         return Promise.resolve();
       }
     };
@@ -122,6 +126,7 @@ export default {
         return Promise.resolve();
       }
     };
+    // from表单
     const formConfig = reactive({  // 类似于JSON对象的语法
       layout: {
         labelCol: { span: 10 },
@@ -133,6 +138,9 @@ export default {
         passwords: "",
         code: ""
       },
+      input_diabled: {
+        username: false
+      },
       rules_form: {
         username: [{ validator: checkUsername, trigger: 'change' }],
         password: [{ validator: checkPassword, trigger: 'change' }],
@@ -141,11 +149,12 @@ export default {
       },
       
     })
+    // data
     const dataItem = reactive({
       // 获取验证码按钮
       button_text: "获取验证码",
       button_loading: false,
-      button_disabled: false,
+      disabled_code_button: true,
       sec: 60,
       // 定时器
       timer: null
@@ -153,7 +162,10 @@ export default {
     const form = toRefs(formConfig);
     const data = toRefs(dataItem);
     
-
+    /**
+     * =============================================================
+     * ================
+     */
     // 提交表单
     const handleFinish = (value) => {
       console.log(value)
@@ -176,6 +188,15 @@ export default {
           dataItem.button_text = `重新获取`;
         }
       }, 1000)
+    }
+
+    const checkUsernameFn = () => {
+      formConfig.input_diabled.username = true;
+      ChekcUsername({username: formConfig.account_form.username}).then(response => {
+        formConfig.input_diabled.username = false;
+      }).catch(error => {
+        formConfig.input_diabled.username = false;
+      })
     }
 
     onMounted(() => {})

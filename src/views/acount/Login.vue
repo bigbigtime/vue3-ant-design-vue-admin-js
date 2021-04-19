@@ -41,7 +41,7 @@
 <script>
 import { onMounted, reactive, toRefs, ref, getCurrentInstance } from "vue";
 // API
-import { GetCode } from "@/api/account";
+import { Send } from "@/api/account";
 // 局部组件（导入）
 import Captcha from "@/components/Captcha";
 export default {
@@ -62,7 +62,7 @@ export default {
     onMounted(() => {})
 
     const submit = () => {
-      GetCode({id:"11", name:"vv"}).then(response => {
+      Send({username:"11", type: "Register"}).then(response => {
 
       })
     }
