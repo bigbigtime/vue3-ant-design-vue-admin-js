@@ -18,35 +18,13 @@ export function ChekcUsername(data){
     })
 }
 
-export function GetCode(data){
+
+/** 用户注册 */
+export function Register(data){
     return service.request({
-        url: '/error/',
+        url: process.env.VUE_APP_APIURL + '/v1/account/register',
         method: 'post',
         data,
     })
 }
-
-/**
- * 帐户体系 - 登录
- */
-export function AccountLogin(data){
-    return service.request({
-        url: process.env.VUE_APP_ACCOUNT_APIURL + 'http://account-test.web-jshtml.cn/login/',
-        method: 'post',
-        data,
-    })
-}
-
-/**
- * 用户体系 - 登录
- */
-export function UserList(data){
-    return service.request({
-        url: process.env.VUE_APP_USER_APIURL + '/list/',
-        method: 'post',
-        data,
-    })
-}
-
-
 

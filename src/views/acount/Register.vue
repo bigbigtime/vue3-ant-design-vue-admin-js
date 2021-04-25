@@ -14,14 +14,14 @@
           <a-input v-model:value="account_form.username" type="text" :disabled="input_diabled.username" autocomplete="off" @change="() => {$refs.username.onFieldChange()}" />
         </a-form-item>
 
-        <a-form-item name="password">
+        <a-form-item name="password" ref="pws">
           <label>密码</label>
-          <a-input v-model:value="account_form.password" type="password" utocomplete="off" />
+          <a-input-password v-model:value="account_form.password" placeholder="请输入密码" @change="() => {$refs.pws.onFieldChange()}"/>
         </a-form-item>
 
-        <a-form-item name="passwords">
+        <a-form-item name="passwords" ref="pwss">
           <label>确认密码</label>
-          <a-input v-model:value="account_form.passwords" type="password" utocomplete="off" />
+          <a-input-password v-model:value="account_form.passwords" placeholder="请再次输入密码" @change="() => {$refs.pwss.onFieldChange()}"/>
         </a-form-item>
 
         <a-form-item name="code">
@@ -40,12 +40,6 @@
             </a-col>
           </a-row>
         </a-form-item>
-
-        <a-form-item>
-          <Captcha />
-          <!-- <-Captcha></Captcha> -->
-        </a-form-item>
-
         <a-form-item>
           <a-button type="primary" html-type="submit" block>
             注册
@@ -64,18 +58,31 @@
 // antdesign
 import { message } from 'ant-design-vue';
 // API
-import { ChekcUsername, Send } from "@/api/account";
+import { ChekcUsername, Send, Register } from "@/api/account";
 // 导入验证类的方法
 import { checkPhone, checkPassword as password, checkCode as code } from "@/utils/verification";
 import { onMounted, reactive, toRefs, ref } from "vue";
+// 路由
+import { useRouter } from "vue-router";
 // 局部组件（导入）
 import Captcha from "@/components/Captcha";
 export default {
   name: "Login",
   components: { Captcha },
   setup(props){
+    // js的语法
+    /**
+     * 1、js的语法跳转
+     * 2、dom标签跳转
+     */
+    /**
+     * 需要让用户返回上一个历史记录，就用push(追加一个历史记录)
+     * 不让用户返回上一个历史记录，就用replace(替换了当前的历史记录)
+     */
+    const { replace } = useRouter();
     const checkUsername = async (rule, value, callback) => {
       if (!value) {
+        dataItem.disabled_code_button = true;
         return Promise.reject('请输入用户名');            //不存在的情况
       }else if(!checkPhone(value)){
         dataItem.disabled_code_button = true;
@@ -167,8 +174,22 @@ export default {
      */
     // 提交表单
     const handleFinish = (value) => {
-      console.log(value)
+      const requestData = {
+        username: formConfig.account_form.username,
+        password: formConfig.account_form.password,
+        code: formConfig.account_form.code
+      }
+      Register(requestData).then(response => {
+        const code = response.content.code;
+        const msg = code ? "注册成功" : response.msg;
+        message.success(msg);
+        // 注册成功跳转登录页面，不需要返回上一个记录
+        replace({
+          name: "Login"
+        })
+      })
     }
+
     // 获取验证码
     const getCode = () => {
       // 按钮加载
@@ -211,8 +232,12 @@ export default {
     const checkUsernameFn = () => {
       formConfig.input_diabled.username = true;
       ChekcUsername({username: formConfig.account_form.username}).then(response => {
+        // 用户名状态
+        const user_status = response.content.user;
+        // 发送验证码按钮状态
+        dataItem.disabled_code_button = user_status;
+        // 用户名输入框状态
         formConfig.input_diabled.username = false;
-        dataItem.disabled_code_button = false;
       }).catch(error => {
         formConfig.input_diabled.username = false;
       })
