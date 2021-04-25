@@ -64,7 +64,7 @@
 // antdesign
 import { message } from 'ant-design-vue';
 // API
-import { ChekcUsername } from "@/api/account";
+import { ChekcUsername, Send } from "@/api/account";
 // 导入验证类的方法
 import { checkPhone, checkPassword as password, checkCode as code } from "@/utils/verification";
 import { onMounted, reactive, toRefs, ref } from "vue";
@@ -82,8 +82,7 @@ export default {
         return Promise.reject('请输入11位数字的手机号');  //手机号错误的情况
       }else{
         // callback();
-        // checkUsernameFn();
-        dataItem.disabled_code_button = false;
+        checkUsernameFn();
         return Promise.resolve();
       }
     };
@@ -155,7 +154,7 @@ export default {
       button_text: "获取验证码",
       button_loading: false,
       disabled_code_button: true,
-      sec: 60,
+      sec: 0,
       // 定时器
       timer: null
     })
@@ -172,11 +171,28 @@ export default {
     }
     // 获取验证码
     const getCode = () => {
-      // 用户名不存在的情况
-      if(!formConfig.account_form.username) {
-        message.error('用户名不能为空');
-        return false;
-      }
+      // 按钮加载
+      dataItem.button_loading = true;
+      // 按钮文本
+      dataItem.button_text = "发送中";
+      // 接口请求
+      Send({username: formConfig.account_form.username, type: "Register"}).then(response => {
+        // 关闭按钮加载
+        dataItem.button_loading = false;
+        // 按钮禁用
+        dataItem.disabled_code_button = true;
+        // 倒计时
+        countDown();
+      }).catch(error => {
+        dataItem.button_text = `重新获取`;
+        // 按钮激活
+        dataItem.disabled_code_button = false;
+      })
+    }
+    // 倒计时
+    const countDown = () => {
+      // 更新时间
+      dataItem.sec = process.env.VUE_APP_COUNTDOWN;
       // 优先判断定时器是否存在，存在则先清除后再开启
       dataItem.timer && clearInterval(dataItem.timer);
       // 开启定时器
@@ -186,6 +202,8 @@ export default {
         if(s <= 0) {
           clearInterval(dataItem.timer);
           dataItem.button_text = `重新获取`;
+          // 按钮激活
+          dataItem.disabled_code_button = false;
         }
       }, 1000)
     }
@@ -194,6 +212,7 @@ export default {
       formConfig.input_diabled.username = true;
       ChekcUsername({username: formConfig.account_form.username}).then(response => {
         formConfig.input_diabled.username = false;
+        dataItem.disabled_code_button = false;
       }).catch(error => {
         formConfig.input_diabled.username = false;
       })

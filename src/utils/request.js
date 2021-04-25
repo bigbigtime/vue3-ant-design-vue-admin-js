@@ -26,7 +26,7 @@ service.interceptors.response.use(function (response) {
      * 2、resCode的什么值代表成功，业务逻辑有问题的情况，代表失败，否则就成功：0
      */
     const data = response.data;
-    if(data.resCode === 0) {
+    if(data.error_code === 0) {
         return Promise.resolve(data);
     }else{
         message.info(data.message);
