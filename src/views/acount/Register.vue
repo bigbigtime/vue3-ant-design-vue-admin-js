@@ -66,6 +66,9 @@ import { onMounted, reactive, toRefs, ref } from "vue";
 import { useRouter } from "vue-router";
 // 局部组件（导入）
 import Captcha from "@/components/Captcha";
+// 加密
+import md5 from 'js-md5';
+import { getAES, getDAes } from "@/utils/crypto";
 export default {
   name: "Login",
   components: { Captcha },
@@ -89,7 +92,8 @@ export default {
         return Promise.reject('请输入11位数字的手机号');  //手机号错误的情况
       }else{
         // callback();
-        checkUsernameFn();
+        // checkUsernameFn();
+        dataItem.disabled_code_button = false;
         return Promise.resolve();
       }
     };
@@ -140,9 +144,9 @@ export default {
       },
       account_form: {
         username: "",
-        password: "",
-        passwords: "",
-        code: ""
+        password: "qq123456",
+        passwords: "qq123456",
+        code: "111111"
       },
       input_diabled: {
         username: false
@@ -176,7 +180,7 @@ export default {
     const handleFinish = (value) => {
       const requestData = {
         username: formConfig.account_form.username,
-        password: formConfig.account_form.password,
+        password: md5(formConfig.account_form.password),
         code: formConfig.account_form.code
       }
       Register(requestData).then(response => {
@@ -191,7 +195,9 @@ export default {
     }
 
     // 获取验证码
-    const getCode = () => {
+    const getCode = async () => {  // async, await
+      const usernameStatus = await checkUsernameFn();  // 等待哪个接口，await就给谁用
+      if(usernameStatus) { return false; }
       // 按钮加载
       dataItem.button_loading = true;
       // 按钮文本
@@ -231,13 +237,17 @@ export default {
 
     const checkUsernameFn = () => {
       formConfig.input_diabled.username = true;
-      ChekcUsername({username: formConfig.account_form.username}).then(response => {
+      return ChekcUsername({username: formConfig.account_form.username}).then(response => {
         // 用户名状态
         const user_status = response.content.user;
         // 发送验证码按钮状态
         dataItem.disabled_code_button = user_status;
         // 用户名输入框状态
         formConfig.input_diabled.username = false;
+        if(user_status) {
+          message.error(response.msg)
+        }
+        return user_status;
       }).catch(error => {
         formConfig.input_diabled.username = false;
       })
