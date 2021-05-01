@@ -28,3 +28,13 @@ export function Register(data){
     })
 }
 
+
+/** 用户登录 */
+export function Login(data){
+    return service.request({
+        url: process.env.VUE_APP_APIURL + '/v1/account/login',
+        method: 'post',
+        data,
+    })
+}
+
