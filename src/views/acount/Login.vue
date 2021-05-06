@@ -130,6 +130,9 @@ export default {
         setToken({ token: data.token });
         setUsername({ value: data.username });
 
+        // sessionStorage
+        localStorage.setItem("abc", data.token);
+
         setTimeout(() => {
           console.log(getToken())
         }, 2000);
