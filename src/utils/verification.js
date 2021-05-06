@@ -14,9 +14,9 @@ export function checkPassword(value){
     return regPassword.test(value);
 }
 /**
- * 6-20数字+英文
+ * 数字
  */
 export function checkCode(value){
-    let regCode = /^(?!\D+$)(?![^a-zA-Z]+$)\S{6}$/;
+    let regCode = /^\d{6}$/;
     return regCode.test(value);
 }
