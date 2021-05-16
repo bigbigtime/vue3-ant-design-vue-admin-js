@@ -4,7 +4,7 @@ import router from "./router";
 import store from "./store";
 // and-design-vue
 import Antd from "ant-design-vue";
-import "ant-design-vue/dist/antd.css";
+import 'ant-design-vue/dist/antd.css';
 // router 拦截
 import "./router/permit";
 // https://vue-i18n-next.intlify.dev/

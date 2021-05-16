@@ -1,5 +1,40 @@
 <template>
-    <a-table :dataSource="data.dataSource" :scroll="{ y: 240 }" :columns="data.columns" :row-selection="rowSelection">
+    <a-row type="flex" class="mb-20">
+        <a-col flex="auto">
+            <a-form layout="inline" :model="formState">
+                <a-form-item label="角色类型">
+                    <a-select v-model:value="value1" style="width: 120px" ref="select">
+                        <a-select-option value="jack">Jack</a-select-option>
+                        <a-select-option value="lucy">Lucy</a-select-option>
+                        <a-select-option value="disabled">Disabled</a-select-option>
+                        <a-select-option value="Yiminghe">yiminghe</a-select-option>
+                    </a-select>
+                </a-form-item>
+                <a-form-item label="状态">
+                    <a-select v-model:value="value1" style="width: 120px" ref="select">
+                        <a-select-option value="jack">禁用</a-select-option>
+                        <a-select-option value="lucy">启用</a-select-option>
+                    </a-select>
+                </a-form-item>
+                <a-form-item label="关键字">
+                    <a-select v-model:value="value1" style="width: 120px" ref="select">
+                        <a-select-option value="jack">用户名</a-select-option>
+                        <a-select-option value="lucy">真实姓名</a-select-option>
+                        <a-select-option value="lucy">手机号</a-select-option>
+                    </a-select>
+                    <a-input-search
+                        placeholder="input search text"
+                        class="ml-10 mr-10 w-200"
+                    />
+                    <a-button type="primary">搜索</a-button>
+                    <a-button type="primary">重置</a-button>
+                    <a-button>导出</a-button>
+                </a-form-item>
+            </a-form>
+        </a-col>
+        <a-col flex="100px"><a-button type="primary" block>新增用户</a-button></a-col>
+    </a-row>
+    <a-table bordered :dataSource="data.dataSource" :scroll="{ y: 240 }" :columns="data.columns" :row-selection="rowSelection">
         <template #status="{ text }">
             <a-switch v-model:checked="checked" />
         </template>
@@ -81,8 +116,23 @@ export default {
             }
         };
 
+        const form = reactive({
+            labelCol: {
+                span: 4,
+            },
+            wrapperCol: {
+                span: 14,
+            },
+        })
+        const form_data = reactive({
+            name: "",
+            aaa: ""
+        })
+
        return {
            data,
+           form,
+           form_data,
            rowSelection
        }
    }
