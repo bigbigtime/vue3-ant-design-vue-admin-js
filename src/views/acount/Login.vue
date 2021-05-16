@@ -60,7 +60,7 @@ export default {
      * 需要让用户返回上一个历史记录，就用push(追加一个历史记录)
      * 不让用户返回上一个历史记录，就用replace(替换了当前的历史记录)
      */
-    const { replace } = useRouter();
+    const { replace, push } = useRouter();
     const checkUsername = async (rule, value, callback) => {
       if (!value) {
         dataItem.disabled_code_button = true;
@@ -129,10 +129,10 @@ export default {
          */
         setToken({ token: data.token });
         setUsername({ value: data.username });
-
-        // sessionStorage
-        localStorage.setItem("abc", data.token);
-
+        // 进入后台
+        push({
+          name: "Index"
+        })
         setTimeout(() => {
           console.log(getToken())
         }, 2000);

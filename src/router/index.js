@@ -77,6 +77,14 @@ const routes = [
         },
         component: () => import("../views/admin/User.vue")
       },
+      {
+        path: "/menu",
+        name: "Menu",
+        meta: {
+          title: "菜单列表"
+        },
+        component: () => import("../views/admin/User.vue")
+      },
     ]
   },
   {
