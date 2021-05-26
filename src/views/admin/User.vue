@@ -38,15 +38,15 @@
         <template #status="{ text }">
             <a-switch />
         </template>
-        <template #operation>
+        <template #operation="{ record }">
             <div id="components-button-demo-basic">
-            <a-button type="primary">编辑</a-button>
+            <a-button type="primary" @click="handlerEdit(record)">编辑</a-button>
             <a-button>删除</a-button>
             <a-button type="danger">详情</a-button>
             </div>
         </template>
     </a-table>
-    <ModalUser v-model:show="data.visible" title="新增用户" />
+    <ModalUser v-model:show="data.visible" v-model:row-id="data.row_id" />
 </template>
 
 <script>
@@ -61,6 +61,7 @@ export default {
             dataSource: [
                 {
                     key: '1',
+                    id: 1,
                     name: '胡彦斌',
                     age: 32,
                     address: '西湖区湖底公园1号',
@@ -68,13 +69,13 @@ export default {
                 },
                 {
                     key: '2',
+                    id: 2,
                     name: '胡彦祖',
                     age: 42,
                     address: '西湖区湖底公园1号',
                     status: false
                 }
             ],
-
             columns: [
                 {
                     title: '姓名',
@@ -104,8 +105,8 @@ export default {
                     slots: { customRender: 'operation' },
                 },
             ],
-
-            visible: false
+            visible: false,
+            row_id: 0
        })
 
        
@@ -135,16 +136,18 @@ export default {
             aaa: ""
         })
 
-        const abc = (data) => {
-        console.log(data)
-       }
+        const handlerEdit = (params) => {
+            data.row_id = params.id;
+            // 对话框显示
+            data.visible = true;
+        }
 
        return {
            data,
            form,
            form_data,
            rowSelection,
-           abc
+           handlerEdit
        }
    }
 }
