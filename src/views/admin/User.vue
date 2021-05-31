@@ -35,13 +35,13 @@
         <a-col flex="100px"><a-button type="primary" block @click="data.visible = true">新增用户</a-button></a-col>
     </a-row>
     <a-table bordered :dataSource="data.dataSource" :scroll="{ y: 240 }" :columns="data.columns" :row-selection="rowSelection">
-        <template #status="{ text }">
-            <a-switch />
+        <template #status="{text, record}">
+            <a-switch @change="handlerSwitch(record)" :checked="text == 1 ? true : false" />
         </template>
         <template #operation="{ record }">
             <div id="components-button-demo-basic">
             <a-button type="primary" @click="handlerEdit(record)">编辑</a-button>
-            <a-button>删除</a-button>
+            <a-button @click="deleteConfirm(record);">删除</a-button>
             <a-button type="danger">详情</a-button>
             </div>
         </template>
@@ -51,48 +51,34 @@
 
 <script>
 import ModalUser from "@/components/Modal/User";
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, createVNode } from "vue";
 // API
-import { UserList } from "@/api/user";
+import { UserList, UserRemove } from "@/api/user";
+// antd
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { Modal, message } from 'ant-design-vue';
 export default {
    name: "",
    components: { ModalUser },
    props: {},
    setup(props){
         const data = reactive({
-            dataSource: [
-                {
-                    key: '1',
-                    id: 1,
-                    name: '胡彦斌',
-                    age: 32,
-                    address: '西湖区湖底公园1号',
-                    status: true
-                },
-                {
-                    key: '2',
-                    id: 2,
-                    name: '胡彦祖',
-                    age: 42,
-                    address: '西湖区湖底公园1号',
-                    status: false
-                }
-            ],
+            dataSource: [],
             columns: [
                 {
-                    title: '姓名',
-                    dataIndex: 'name',
-                    key: 'name',
+                    title: '用户名',
+                    dataIndex: 'username',
+                    key: 'username',
                 },
                 {
-                    title: '年龄',
-                    dataIndex: 'age',
-                    key: 'age',
+                    title: '真实姓名',
+                    dataIndex: 'truename',
+                    key: 'truename',
                 },
                 {
-                    title: '住址',
-                    dataIndex: 'address',
-                    key: 'address',
+                    title: '手机号',
+                    dataIndex: 'phone',
+                    key: 'phone',
                 },
                 {
                     title: '状态(禁/启用)',
@@ -146,22 +132,53 @@ export default {
 
         const getUserList = () => {
             UserList({pageSize: 10, pageNumber:1}).then(response => {
-
+                const response_data = response.content;
+                data.dataSource = response_data.data;
             })
         }
+        getUserList();
 
+        // 加载完成
         onMounted(() => {
-            getUserList();
+            
             console.log("111")
         })
 
-       return {
-           data,
-           form,
-           form_data,
-           rowSelection,
-           handlerEdit
-       }
+        // switch
+        const handlerSwitch = (data) => {
+            data.status = data.status  == 1 ? false : true;
+        }
+        // delete
+        const deleteConfirm = (data) => {
+            Modal.confirm({
+                title: '温馨提示',
+                icon: createVNode(ExclamationCircleOutlined),
+                content: '确认删除此信息，删除后无法恢复？',
+                okText: '确认',
+                okType: 'danger',
+                cancelText: '取消',
+                onOk() {
+                    deleteApi(data);
+                },
+                onCancel() {},
+            });
+        }
+        const deleteApi = (data) => {
+            UserRemove({"member_id": data.member_id}).then(response => {
+                message.success(response.msg);
+                getUserList();
+            })
+        }
+
+        return {
+            data,
+            form,
+            form_data,
+            rowSelection,
+            handlerEdit,
+            deleteConfirm,
+            handlerSwitch
+        }
    }
 }
 </script>

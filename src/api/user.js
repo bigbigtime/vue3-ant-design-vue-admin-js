@@ -17,3 +17,12 @@ export function UserList(data){
         data,
     })
 }
+
+/** 用户删除 */
+export function UserRemove(data){
+    return service.request({
+        url: process.env.VUE_APP_APIURL_USER + '/v1/user/remove',
+        method: 'post',
+        data,
+    })
+}
