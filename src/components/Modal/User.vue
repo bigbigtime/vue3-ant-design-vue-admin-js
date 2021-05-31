@@ -1,14 +1,17 @@
 <template>
-  <a-modal v-model:visible="visible" :title="rowId ? '编辑用户' : '新增用户'" @cancel="close">
+  <a-modal v-model:visible="visible" :title="rowId ? '编辑用户' : '新增用户'" @cancel="close" :confirm-loading="data.confirmLoading" @ok="handleOk">
     <a-form ref="formRef" :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
+      <a-form-item label="手机号" name="phone">
+        <a-input v-model:value="formState.phone" />
+      </a-form-item>
       <a-form-item label="用户名" name="username">
         <a-input v-model:value="formState.username" />
       </a-form-item>
       <a-form-item label="真实名称" name="truename">
         <a-input v-model:value="formState.truename" />
       </a-form-item>
-      <a-form-item label="手机号" name="phone">
-        <a-input v-model:value="formState.phone" />
+      <a-form-item label="密码" name="password">
+        <a-input v-model:value="formState.password" />
       </a-form-item>
       <a-form-item label="身份证" name="cardId">
         <a-input v-model:value="formState.cardId" />
@@ -25,6 +28,12 @@
 
 <script>
 import { reactive, ref, onMounted, watch } from 'vue';
+// API
+import { UserCreate } from "@/api/user";
+// 加密
+import md5 from 'js-md5';
+// antdesign
+import { message } from 'ant-design-vue';
 export default {
   name: '',
   components: {},
@@ -40,13 +49,16 @@ export default {
   },
   emits: ["update:show", "aaa"],
   setup(props, context){
-
+    const data = reactive({
+      confirmLoading: false
+    })
     const formState = reactive({
       username: "",
       truename: "",
       phone: "",
       cardId: "",
       role: "",
+      password: "",
       status: true
     });
     const roleOptions = [
@@ -64,13 +76,35 @@ export default {
     watch(() => props.show, (newValue, oldValue) => {
       visible.value = newValue;
     })
-
-
+    // 关闭按钮事件
     const close = () => {
       resetForm();
       context.emit("update:show", false);
       context.emit("update:rowId", "");
     }
+    // 确认按钮事件
+    const handleOk = () => {
+      data.confirmLoading = true;
+      // 密码加密
+      const request_data = Object.assign({}, formState);
+      request_data.password = md5(request_data.password);
+      UserCreate(formState).then(response => {
+        const response_data = response.content;
+        // 还原加载状态
+        data.confirmLoading = false;
+        // 用户存在
+        if(!response_data.user) {
+          message.error(response.msg);
+          return false;
+        }
+        // 用户新增成功
+        message.error(response.msg);
+        close();
+      }).catch(error => {
+        data.confirmLoading = false;
+      })
+    }
+    // 获取form表单
     const formRef = ref(null);
     const resetForm = () => {
       formRef.value.resetFields();
@@ -89,7 +123,9 @@ export default {
       formState,
       roleOptions,
       isOptions,
-      formRef
+      formRef,
+      data,
+      handleOk
     }
   }
 }

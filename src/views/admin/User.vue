@@ -51,7 +51,9 @@
 
 <script>
 import ModalUser from "@/components/Modal/User";
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
+// API
+import { UserList } from "@/api/user";
 export default {
    name: "",
    components: { ModalUser },
@@ -141,6 +143,17 @@ export default {
             // 对话框显示
             data.visible = true;
         }
+
+        const getUserList = () => {
+            UserList({pageSize: 10, pageNumber:1}).then(response => {
+
+            })
+        }
+
+        onMounted(() => {
+            getUserList();
+            console.log("111")
+        })
 
        return {
            data,
