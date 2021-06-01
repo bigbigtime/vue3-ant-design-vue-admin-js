@@ -29,7 +29,7 @@
 <script>
 import { reactive, ref, onMounted, watch } from 'vue';
 // API
-import { UserCreate } from "@/api/user";
+import { UserCreate, UserInfo } from "@/api/user";
 // 加密
 import md5 from 'js-md5';
 // antdesign
@@ -52,7 +52,7 @@ export default {
     const data = reactive({
       confirmLoading: false
     })
-    const formState = reactive({
+    let formState = reactive({
       username: "",
       truename: "",
       phone: "",
@@ -75,7 +75,22 @@ export default {
     const visible = ref(false);
     watch(() => props.show, (newValue, oldValue) => {
       visible.value = newValue;
+      // 用户详情请求
+      newValue && getUserInfo();
     })
+
+    const getUserInfo = () => {
+      UserInfo({member_id: props.rowId}).then(response => {
+        const request_data = response.content;
+        const keys = Object.keys(request_data);
+        // 匹配字段赋值
+        for(let key in formState) {
+          if(keys.includes(key)) {
+            formState[key] = request_data[key]
+          }
+        }
+      })
+    }
     // 关闭按钮事件
     const close = () => {
       resetForm();

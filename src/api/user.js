@@ -26,3 +26,23 @@ export function UserRemove(data){
         data,
     })
 }
+
+/** 用户状态 */
+export function UserStatus(data){
+    return service.request({
+        url: process.env.VUE_APP_APIURL_USER + '/v1/user/status',
+        method: 'post',
+        data,
+    })
+}
+
+
+/** 用户详情 */
+export function UserInfo(data){
+    return service.request({
+        url: process.env.VUE_APP_APIURL_USER + '/v1/user/info',
+        method: 'post',
+        data,
+    })
+}
+

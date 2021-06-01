@@ -36,7 +36,7 @@
     </a-row>
     <a-table bordered :dataSource="data.dataSource" :scroll="{ y: 240 }" :columns="data.columns" :row-selection="rowSelection">
         <template #status="{text, record}">
-            <a-switch @change="handlerSwitch(record)" :checked="text == 1 ? true : false" />
+            <a-switch :loading="record.loading" @change="handlerSwitch(record)" :checked="text == 1 ? true : false" />
         </template>
         <template #operation="{ record }">
             <div id="components-button-demo-basic">
@@ -53,7 +53,7 @@
 import ModalUser from "@/components/Modal/User";
 import { reactive, onMounted, createVNode } from "vue";
 // API
-import { UserList, UserRemove } from "@/api/user";
+import { UserList, UserRemove, UserStatus } from "@/api/user";
 // antd
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { Modal, message } from 'ant-design-vue';
@@ -125,7 +125,7 @@ export default {
         })
 
         const handlerEdit = (params) => {
-            data.row_id = params.id;
+            data.row_id = params.member_id;
             // 对话框显示
             data.visible = true;
         }
@@ -146,7 +146,16 @@ export default {
 
         // switch
         const handlerSwitch = (data) => {
-            data.status = data.status  == 1 ? false : true;
+            const status = data.status == 1 ? false : true;
+            data.status = status;
+
+            data.loading = true;
+            UserStatus({member_id: data.member_id, status}).then(response => {
+                data.loading = false;
+                message.success(response.msg);
+            }).catch(error => {
+                data.loading = false;
+            })
         }
         // delete
         const deleteConfirm = (data) => {
