@@ -13,8 +13,8 @@
       <a-form-item label="密码" name="password">
         <a-input v-model:value="formState.password" />
       </a-form-item>
-      <a-form-item label="身份证" name="cardId">
-        <a-input v-model:value="formState.cardId" />
+      <a-form-item label="身份证" name="card_id">
+        <a-input v-model:value="formState.card_id" />
       </a-form-item>
       <a-form-item label="角色类型" name="role">
         <a-radio-group :options="roleOptions" v-model:value="formState.role" />
@@ -56,7 +56,7 @@ export default {
       username: "",
       truename: "",
       phone: "",
-      cardId: "",
+      card_id: "",
       role: "",
       password: "",
       status: true
