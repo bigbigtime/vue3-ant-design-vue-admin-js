@@ -29,11 +29,13 @@
 <script>
 import { reactive, ref, onMounted, watch } from 'vue';
 // API
-import { UserCreate, UserInfo } from "@/api/user";
+import { UserCreate, UserInfo, UserUpdate } from "@/api/user";
 // 加密
 import md5 from 'js-md5';
 // antdesign
 import { message } from 'ant-design-vue';
+// utils
+import { requestDataFormat } from "@/utils/formatData";
 export default {
   name: '',
   components: {},
@@ -76,29 +78,33 @@ export default {
     watch(() => props.show, (newValue, oldValue) => {
       visible.value = newValue;
       // 用户详情请求
-      newValue && getUserInfo();
+      (props.rowId && newValue) && getUserInfo();
     })
 
     const getUserInfo = () => {
       UserInfo({member_id: props.rowId}).then(response => {
-        const request_data = response.content;
-        const keys = Object.keys(request_data);
-        // 匹配字段赋值
-        for(let key in formState) {
-          if(keys.includes(key)) {
-            formState[key] = request_data[key]
-          }
-        }
+        // requestDataFormat(response.content, formState, ["status", "type"]); 
+        requestDataFormat({
+          data: response.content,
+          form: formState,
+          match: ["status", "type"]
+        }); 
       })
     }
     // 关闭按钮事件
     const close = () => {
       resetForm();
+      data.member_id = "";
       context.emit("update:show", false);
       context.emit("update:rowId", "");
     }
     // 确认按钮事件
     const handleOk = () => {
+      props.rowId ? handlerUserEdit() : handlerUserAdd();
+    }
+
+    // 用户新增
+    const handlerUserAdd = () => {
       data.confirmLoading = true;
       // 密码加密
       const request_data = Object.assign({}, formState);
@@ -112,6 +118,27 @@ export default {
           message.error(response.msg);
           return false;
         }
+        // 用户新增成功
+        message.error(response.msg);
+        close();
+      }).catch(error => {
+        data.confirmLoading = false;
+      })
+    }
+    // 用户编辑
+    const handlerUserEdit = () => {
+      data.confirmLoading = true;
+      // 密码加密
+      const request_data = Object.assign({}, formState);
+      if(request_data.password) {
+        request_data.password = md5(request_data.password);
+      }else{
+        delete request_data.password
+      }
+      UserUpdate({...request_data, member_id:props.rowId}).then(response => {
+        const response_data = response.content;
+        // 还原加载状态
+        data.confirmLoading = false;
         // 用户新增成功
         message.error(response.msg);
         close();

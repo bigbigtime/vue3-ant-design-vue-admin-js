@@ -46,3 +46,12 @@ export function UserInfo(data){
     })
 }
 
+/** 用户编辑 */
+export function UserUpdate(data){
+    return service.request({
+        url: process.env.VUE_APP_APIURL_USER + '/v1/user/update ',
+        method: 'post',
+        data,
+    })
+}
+
