@@ -3,7 +3,7 @@ import axios from "axios";
 import { getToken } from "./cookies";
 import { message } from "ant-design-vue";
 const service = axios.create({
-    baseURL: process.env.VUE_APP_FLAG,
+    baseURL: "",
     timeout: 5000
 });
 

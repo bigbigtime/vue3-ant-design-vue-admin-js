@@ -49,7 +49,7 @@ export default {
       default: ""
     }
   },
-  emits: ["update:show", "aaa"],
+  emits: ["update:show", "update:rowId", "loadData"],
   setup(props, context){
     const data = reactive({
       confirmLoading: false
@@ -121,6 +121,7 @@ export default {
         // 用户新增成功
         message.error(response.msg);
         close();
+        context.emit("loadData");
       }).catch(error => {
         data.confirmLoading = false;
       })
@@ -142,6 +143,7 @@ export default {
         // 用户新增成功
         message.error(response.msg);
         close();
+        context.emit("loadData");
       }).catch(error => {
         data.confirmLoading = false;
       })
