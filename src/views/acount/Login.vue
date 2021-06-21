@@ -41,15 +41,13 @@ import { checkPhone, checkPassword as password } from "@/utils/verification";
 import { onMounted, reactive, toRefs, ref } from "vue";
 // 路由
 import { useRouter } from "vue-router";
-// 局部组件（导入）
-import Captcha from "@/components/Captcha";
 // 加密
 import md5 from 'js-md5';
 // cookies
 import { setToken, setUsername, getToken } from "@/utils/cookies";
 export default {
   name: "Login",
-  components: { Captcha },
+  components: {},
   setup(props){
     // js的语法
     /**

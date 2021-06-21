@@ -64,14 +64,12 @@ import { checkPhone, checkPassword as password, checkCode as code } from "@/util
 import { onMounted, reactive, toRefs, ref } from "vue";
 // 路由
 import { useRouter } from "vue-router";
-// 局部组件（导入）
-import Captcha from "@/components/Captcha";
 // 加密
 import md5 from 'js-md5';
 import { getAES, getDAes } from "@/utils/crypto";
 export default {
   name: "Login",
-  components: { Captcha },
+  components: {},
   setup(props){
     // js的语法
     /**

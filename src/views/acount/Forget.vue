@@ -42,11 +42,6 @@
         </a-form-item>
 
         <a-form-item>
-          <Captcha />
-          <!-- <-Captcha></Captcha> -->
-        </a-form-item>
-
-        <a-form-item>
           <a-button type="primary" html-type="submit" block>
             重置密码
           </a-button>
@@ -66,11 +61,9 @@ import { message } from 'ant-design-vue';
 // 导入验证类的方法
 import { checkPhone, checkPassword as password, checkCode as code } from "@/utils/verification";
 import { onMounted, reactive, toRefs, ref, getCurrentInstance } from "vue";
-// 局部组件（导入）
-import Captcha from "@/components/Captcha";
 export default {
   name: "Login",
-  components: { Captcha },
+  components: {},
   setup(props){
     const { ctx } = getCurrentInstance();
     ctx.$axios.post("getSms")

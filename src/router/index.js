@@ -83,7 +83,7 @@ const routes = [
         meta: {
           title: "菜单列表"
         },
-        component: () => import("../views/admin/User.vue")
+        component: () => import("../views/admin/Menu.vue")
       },
     ]
   },
