@@ -29,19 +29,19 @@
                 <a-form-item label="当前菜单" name="phone">
                     <a-input />
                 </a-form-item>
-                <a-form-item label="菜单名称（中文）" name="username">
+                <a-form-item label="菜单名称（中文）" name="username" v-model.value="field.menu_name_cn">
+                    <a-input  />
+                </a-form-item>
+                <a-form-item label="菜单名称（英文）" name="username" v-model.value="field.menu_name_en">
                     <a-input />
                 </a-form-item>
-                <a-form-item label="菜单名称（英文）" name="username">
+                <a-form-item label="路由名称" name="username" v-model.value="field.router_name">
                     <a-input />
                 </a-form-item>
-                <a-form-item label="页面路径" name="username">
+                <a-form-item label="页面路径" name="username" v-model.value="field.component">
                     <a-input />
                 </a-form-item>
-                <a-form-item label="页面路径" name="username">
-                    <a-input-number size="small" :min="1" :max="10" />
-                </a-form-item>
-                <a-form-item label="图标" name="username">
+                <a-form-item label="图标" name="username" v-model.value="field.icon">
                     <a-upload
                         v-model:file-list="fileList"
                         name="avatar"
@@ -60,8 +60,21 @@
                         </div>
                     </a-upload>
                 </a-form-item>
-                <a-form-item label="角色类型" name="role">
-                    <a-radio-group :options="roleOptions" />
+                <a-form-item label="页面路径" name="username" v-model.value="field.sort">
+                    <a-input-number :min="1" :max="10" />
+                </a-form-item>
+                <a-form-item label="禁启用" name="status" v-model.value="field.disabled">
+                    <a-radio-group :options="data.isOptions" />
+                </a-form-item>
+                <a-form-item label="页面缓存" name="status" v-model.value="field.keep">
+                    <a-radio-group :options="data.isOptions" />
+                </a-form-item>
+                <a-form-item label="重定向" name="username" v-model.value="field.redirect">
+                    <a-input />
+                </a-form-item>
+                <a-form-item :wrapper-col="{ span: 14, offset: 8 }">
+                    <a-button type="primary">确定添加</a-button>
+                    <a-button>重置</a-button>
                 </a-form-item>
             </a-form>
             </div>
@@ -70,7 +83,7 @@
 </template>
 
 <script>
-import { reactive } from "vue";
+import { reactive, toRefs } from "vue";
 export default {
     name: "Menu",
     components: {},
@@ -121,7 +134,25 @@ export default {
                         key: 'user'
                     }
                 ]
-            }]
+            }],
+            isOptions: [
+                { label: '启用', value: '0' },
+                { label: '禁用', value: '1' }
+            ]
+        })
+        const form = reactive({
+            field: {
+                menu_name_cn: "",
+                menu_name_en: "",
+                router_name: "",
+                component: "",
+                icon: "",
+                sort: "",
+                disabled: "0",
+                keep: "0",
+                redirect: "",
+                lang: "en",
+            }
         })
         return {
             data,
@@ -131,6 +162,7 @@ export default {
             wrapperCol: {
                 span: 14,
             },
+            ...(toRefs(form))
         }
     }
 }

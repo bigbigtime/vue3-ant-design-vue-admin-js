@@ -8,7 +8,7 @@
  * 2. Prevent adjustments of font size after orientation changes in iOS.
  */
  /* div的默认样式不存在padding和margin为0的情况*/
- html, body, div, span, applet, object, iframe,
+ html, body, span, applet, object, iframe,
  h1, h2, h3, h4, h5, h6, p, blockquote, pre,
  a, abbr, acronym, address, big, cite, code,
  del, dfn, em, img, ins, kbd, q, s, samp,
@@ -184,7 +184,6 @@
    */
   
   button,
-  input,
   optgroup,
   select,
   textarea {
