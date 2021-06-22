@@ -57,6 +57,7 @@ const routes = [
     name: "AdminIndex",
     meta: {
       title: "管理总台",
+      title_en: "",
       icon: "console"
     },
     component: () => import("../views/layout/Index.vue"),

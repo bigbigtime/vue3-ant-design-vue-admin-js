@@ -3,7 +3,7 @@
         <a-col :span="8">
             <div class="header-wrap">
                 <h4>菜单列表</h4>
-                <div class="button-group"><a-button type="primary">一级添加菜单</a-button></div>
+                <div class="button-group"><a-button type="primary" @click="handlerCategory('first_category_add')">一级添加菜单</a-button></div>
             </div>
             <hr />
             <a-tree :tree-data="data.tree_data" :defaultExpandAll="true">
@@ -11,8 +11,8 @@
                     <div class="menu-item">
                         <span>{{ title }}</span>
                         <div class="button-group">
-                            <a-button class="button-mini" type="primary">添加子菜单</a-button>
-                            <a-button class="button-mini">编辑</a-button>
+                            <a-button class="button-mini" type="primary" @click="handlerCategory('child_category_add')">添加子菜单</a-button>
+                            <a-button class="button-mini" @click="handlerCategory('category_edit')">编辑</a-button>
                             <a-button class="button-mini">删除</a-button>
                         </div>
                     </div>
@@ -25,25 +25,28 @@
             </div>
             <hr />
             <div class="form-wrap">
-            <a-form ref="formRef" :label-col="labelCol" :wrapper-col="wrapperCol">
-                <a-form-item label="当前菜单" name="phone">
+            <a-form ref="formDom" @finish="handleFinish" :model="field" :rules="rules_form" :label-col="labelCol" :wrapper-col="wrapperCol">
+                <!-- <a-form-item label="当前菜单" name="phone">
                     <a-input />
+                </a-form-item> -->
+                <a-form-item label="菜单名称（中文）" name="menu_name_cn" >
+                    <a-input v-model:value="field.menu_name_cn" />
                 </a-form-item>
-                <a-form-item label="菜单名称（中文）" name="username" v-model.value="field.menu_name_cn">
-                    <a-input  />
+                <a-form-item label="菜单名称（英文）" name="menu_name_en">
+                    <a-input  v-model:value="field.menu_name_en" />
                 </a-form-item>
-                <a-form-item label="菜单名称（英文）" name="username" v-model.value="field.menu_name_en">
-                    <a-input />
+                <a-form-item label="Path路径" name="router_path">
+                    <a-input  v-model:value="field.router_path"/>
                 </a-form-item>
-                <a-form-item label="路由名称" name="username" v-model.value="field.router_name">
-                    <a-input />
+                <a-form-item label="路由名称" name="router_name">
+                    <a-input  v-model:value="field.router_name"/>
                 </a-form-item>
-                <a-form-item label="页面路径" name="username" v-model.value="field.component">
-                    <a-input />
+                <a-form-item label="页面路径" name="component">
+                    <a-input v-model:value="field.component" />
                 </a-form-item>
-                <a-form-item label="图标" name="username" v-model.value="field.icon">
+                <a-form-item label="图标" name="icon">
                     <a-upload
-                        v-model:file-list="fileList"
+                        v-model:file-list="field.icon"
                         name="avatar"
                         list-type="picture-card"
                         class="avatar-uploader"
@@ -60,20 +63,20 @@
                         </div>
                     </a-upload>
                 </a-form-item>
-                <a-form-item label="页面路径" name="username" v-model.value="field.sort">
-                    <a-input-number :min="1" :max="10" />
+                <a-form-item label="排序" name="sort">
+                    <a-input-number :min="1" :max="10" v-model:value="field.sort" />
                 </a-form-item>
-                <a-form-item label="禁启用" name="status" v-model.value="field.disabled">
-                    <a-radio-group :options="data.isOptions" />
+                <a-form-item label="禁启用" name="disabled">
+                    <a-radio-group :options="data.isOptions" v-model:value="field.disabled" />
                 </a-form-item>
-                <a-form-item label="页面缓存" name="status" v-model.value="field.keep">
-                    <a-radio-group :options="data.isOptions" />
+                <a-form-item label="页面缓存" name="keep">
+                    <a-radio-group :options="data.isOptions" v-model:value="field.keep" />
                 </a-form-item>
-                <a-form-item label="重定向" name="username" v-model.value="field.redirect">
-                    <a-input />
+                <a-form-item label="重定向" name="redirect">
+                    <a-input  v-model:value="field.redirect"/>
                 </a-form-item>
                 <a-form-item :wrapper-col="{ span: 14, offset: 8 }">
-                    <a-button type="primary">确定添加</a-button>
+                    <a-button type="primary" html-type="submit" :disabled="!data.menu_type" :loading="data.submit_loading">确定添加</a-button>
                     <a-button>重置</a-button>
                 </a-form-item>
             </a-form>
@@ -83,7 +86,11 @@
 </template>
 
 <script>
-import { reactive, toRefs } from "vue";
+import { ref, reactive, toRefs } from "vue";
+// API
+import { MenuCreate } from "@/api/menu";
+// antdesign
+import { message } from 'ant-design-vue';
 export default {
     name: "Menu",
     components: {},
@@ -138,7 +145,9 @@ export default {
             isOptions: [
                 { label: '启用', value: '0' },
                 { label: '禁用', value: '1' }
-            ]
+            ],
+            menu_type: "",
+            submit_loading: false
         })
         const form = reactive({
             field: {
@@ -152,8 +161,41 @@ export default {
                 keep: "0",
                 redirect: "",
                 lang: "en",
-            }
+            },
+            rules_form: {
+                menu_name_cn: [{ required: true, message: "请输入中文名称", trigger: 'blur' }],
+                menu_name_en: [{ required: true, message: "请输入英文名称", trigger: 'blur' }],
+                router_name: [{ required: true, message: "请输入路由名称", trigger: 'blur' }],
+                component: [{ required: true, message: "请输入组件路由", trigger: 'blur' }]
+            },
         })
+        /** 菜单添加 */
+        const handlerCategory = (type) => {
+            // 标记类型
+            data.menu_type = type;
+            handlerRrsetFeild();
+        }
+        /** 表单提交 */
+        const handleFinish = () => {
+            if(data.menu_type === "first_category_add") { handlerFirstCategoryAdd(); }
+        }
+        /** 一级菜单添加 */
+        const handlerFirstCategoryAdd = () => {
+            data.submit_loading = true;
+            MenuCreate(form.field).then(response => {
+                data.submit_loading = false;
+                message.success("添加成功");
+                handlerRrsetFeild();
+                data.menu_type = "";
+            }).catch(error => {
+                data.submit_loading = false;
+            })
+        } 
+        /** 清除表单数据 */
+        const formDom = ref(null);
+        const handlerRrsetFeild = () => {
+            formDom.value.resetFields();
+        }
         return {
             data,
             labelCol: {
@@ -162,7 +204,10 @@ export default {
             wrapperCol: {
                 span: 14,
             },
-            ...(toRefs(form))
+            ...(toRefs(form)),
+            handleFinish,
+            formDom,
+            handlerCategory
         }
     }
 }
