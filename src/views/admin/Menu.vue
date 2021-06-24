@@ -165,6 +165,7 @@ export default {
             rules_form: {
                 menu_name_cn: [{ required: true, message: "请输入中文名称", trigger: 'blur' }],
                 menu_name_en: [{ required: true, message: "请输入英文名称", trigger: 'blur' }],
+                router_path: [{ required: true, message: "请输入路由Path", trigger: 'blur' }],
                 router_name: [{ required: true, message: "请输入路由名称", trigger: 'blur' }],
                 component: [{ required: true, message: "请输入组件路由", trigger: 'blur' }]
             },
