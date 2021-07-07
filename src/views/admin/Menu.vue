@@ -6,12 +6,12 @@
                 <div class="button-group"><a-button type="primary" @click="handlerCategory('first_category_add')">一级添加菜单</a-button></div>
             </div>
             <hr />
-            <a-tree :tree-data="data.tree_data" :defaultExpandAll="true">
-                <template #title="{ key: treeKey, title }">
+            <a-tree :tree-data="data.tree_data" :defaultExpandAll="true" >
+                <template #title="{ menu_id, menu_name_cn }">
                     <div class="menu-item">
-                        <span>{{ title }}</span>
+                        <span>{{ menu_name_cn }}</span>
                         <div class="button-group">
-                            <a-button class="button-mini" type="primary" @click="handlerCategory('child_category_add')">添加子菜单</a-button>
+                            <a-button class="button-mini" type="primary" @click="handlerCategory('child_category_add', menu_id)">添加子菜单</a-button>
                             <a-button class="button-mini" @click="handlerCategory('category_edit')">编辑</a-button>
                             <a-button class="button-mini">删除</a-button>
                         </div>
@@ -66,6 +66,9 @@
                 <a-form-item label="排序" name="sort">
                     <a-input-number :min="1" :max="10" v-model:value="field.sort" />
                 </a-form-item>
+                <a-form-item label="隐藏路由" name="hidden">
+                    <a-radio-group :options="data.isOptions" v-model:value="field.hidden" />
+                </a-form-item>
                 <a-form-item label="禁启用" name="disabled">
                     <a-radio-group :options="data.isOptions" v-model:value="field.disabled" />
                 </a-form-item>
@@ -86,9 +89,9 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs } from "vue";
+import { ref, reactive, toRefs, onBeforeMount } from "vue";
 // API
-import { MenuCreate } from "@/api/menu";
+import { MenuCreate, MenuListTree, MenuList } from "@/api/menu";
 // antdesign
 import { message } from 'ant-design-vue';
 export default {
@@ -97,56 +100,13 @@ export default {
     props: {},
     setup(){
         const data = reactive({
-            tree_data: [
-            {
-                title: '系统设置',
-                key: 'system',
-                children: [
-                    {
-                        title: '角色管理',
-                        key: 'role',
-                        children: [
-                            {
-                                title: '角色管理',
-                                key: 'role',
-                                children: [
-                    {
-                        title: '角色管理',
-                        key: 'role'
-                    },
-                    {
-                        title: '用户列表',
-                        key: 'user',
-                        children: [
-                    {
-                        title: '角色管理',
-                        key: 'role'
-                    },
-                    {
-                        title: '用户列表',
-                        key: 'user'
-                    }
-                ]
-                    }
-                ]
-                            },
-                            {
-                                title: '用户列表',
-                                key: 'user'
-                            }
-                        ]
-                    },
-                    {
-                        title: '用户列表',
-                        key: 'user'
-                    }
-                ]
-            }],
+            tree_data: [],
             isOptions: [
                 { label: '启用', value: '0' },
                 { label: '禁用', value: '1' }
             ],
             menu_type: "",
+            menu_id: 0,
             submit_loading: false
         })
         const form = reactive({
@@ -157,6 +117,7 @@ export default {
                 component: "",
                 icon: "",
                 sort: "",
+                hidden: "0",
                 disabled: "0",
                 keep: "0",
                 redirect: "",
@@ -170,23 +131,30 @@ export default {
             },
         })
         /** 菜单添加 */
-        const handlerCategory = (type) => {
+        const handlerCategory = (type, menu_id) => {
+            console.log(menu_id);
             // 标记类型
             data.menu_type = type;
+            // 菜单ID
+            data.menu_id = menu_id || 0;
             handlerRrsetFeild();
         }
         /** 表单提交 */
         const handleFinish = () => {
-            if(data.menu_type === "first_category_add") { handlerFirstCategoryAdd(); }
+            if(data.menu_type === "first_category_add" || data.menu_type === "child_category_add") { handlerFirstCategoryAdd(); }
         }
         /** 一级菜单添加 */
         const handlerFirstCategoryAdd = () => {
             data.submit_loading = true;
-            MenuCreate(form.field).then(response => {
+            // parent_id
+            const request_data = {};
+            if(data.menu_type === "child_category_add") { request_data.parent_id = data.menu_id; }
+            MenuCreate({...form.field, ...request_data}).then(response => {
                 data.submit_loading = false;
                 message.success("添加成功");
                 handlerRrsetFeild();
                 data.menu_type = "";
+                getMenuList();
             }).catch(error => {
                 data.submit_loading = false;
             })
@@ -196,6 +164,91 @@ export default {
         const handlerRrsetFeild = () => {
             formDom.value.resetFields();
         }
+
+        const getMenuListTree = () => {
+            MenuListTree().then(response => {
+                data.tree_data = response.content;
+            })
+        }
+
+        const getMenuList = () => {
+            MenuList().then(response => {
+                const response_data = response.content;
+                data.tree_data = formatTree({
+                    data: response_data, 
+                    id: "menu_id", 
+                    parent_id: "parent_id", 
+                    child: "children",
+                    root: 0
+                });
+            })
+        }
+
+        const formatTree = (params) => {  // 自己调用自己
+            const tree = [];
+            if(params.data.length > 0) {
+                params.data.forEach(item => {
+                    // 获取顶层菜单，parent_id === 0
+                    if(item[params.parent_id] === params.root) {
+                        const child = formatTree({
+                            data: params.data, 
+                            id: params.id, 
+                            parent_id: params.parent_id, 
+                            child: params.child,
+                            root: item[params.id]
+                        });
+                        if(child) {
+                            item[params.child] = child;
+                        }
+                        tree.push(item);
+                    }
+                })
+            }
+            return tree;
+        }
+/**
+component: "f"
+hidden: null
+icon: ""
+keep: "0"
+lang: "en"
+menu_id: 11
+menu_name_cn: "ff"
+menu_name_en: "f"
+parent_id: 0
+redirect: ""
+router_name: "f"
+router_path: null
+sort: 0
+
+
+component: "df"
+hidden: null
+icon: ""
+keep: "0"
+lang: "en"
+menu_id: 12
+menu_name_cn: "dfdf"
+menu_name_en: "df"
+parent_id: 11
+redirect: ""
+router_name: "df"
+router_path: null
+sort: 0
+
+
+
+ */
+
+
+
+
+
+
+        onBeforeMount(() => {
+            // getMenuListTree();
+            getMenuList();
+        })
         return {
             data,
             labelCol: {
