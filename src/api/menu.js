@@ -26,3 +26,30 @@ export function MenuList(data = {}){
         data,
     })
 }
+
+/** 菜单详情 */
+export function MenuDetailed(data = {}){
+    return service.request({
+        url: process.env.VUE_APP_APIURL_USER + '/v1/menu/detailed',
+        method: 'post',
+        data,
+    })
+}
+
+/** 菜单详情 */
+export function MenuUpdate(data = {}){
+    return service.request({
+        url: process.env.VUE_APP_APIURL_USER + '/v1/menu/update',
+        method: 'post',
+        data,
+    })
+}
+
+/** 菜单详情 */
+export function MenuRemove(data = {}){
+    return service.request({
+        url: process.env.VUE_APP_APIURL_USER + '/v1/menu/remove',
+        method: 'post',
+        data,
+    })
+}

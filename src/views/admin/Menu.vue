@@ -12,8 +12,8 @@
                         <span>{{ menu_name_cn }}</span>
                         <div class="button-group">
                             <a-button class="button-mini" type="primary" @click="handlerCategory('child_category_add', menu_id)">添加子菜单</a-button>
-                            <a-button class="button-mini" @click="handlerCategory('category_edit')">编辑</a-button>
-                            <a-button class="button-mini">删除</a-button>
+                            <a-button class="button-mini" @click="handlerCategory('category_edit', menu_id)">编辑</a-button>
+                            <a-button class="button-mini" @click="handlerMenuDel(menu_id)">删除</a-button>
                         </div>
                     </div>
                 </template>
@@ -25,6 +25,7 @@
             </div>
             <hr />
             <div class="form-wrap">
+            <a-spin :spinning="data.spinning">
             <a-form ref="formDom" @finish="handleFinish" :model="field" :rules="rules_form" :label-col="labelCol" :wrapper-col="wrapperCol">
                 <!-- <a-form-item label="当前菜单" name="phone">
                     <a-input />
@@ -79,10 +80,13 @@
                     <a-input  v-model:value="field.redirect"/>
                 </a-form-item>
                 <a-form-item :wrapper-col="{ span: 14, offset: 8 }">
-                    <a-button type="primary" html-type="submit" :disabled="!data.menu_type" :loading="data.submit_loading">确定添加</a-button>
+                    <a-button type="primary" html-type="submit" :disabled="!data.menu_type" :loading="data.submit_loading">
+                        确定{{ data.menu_type === "category_edit" ? "修改" : "添加" }}
+                    </a-button>
                     <a-button>重置</a-button>
                 </a-form-item>
             </a-form>
+            </a-spin>
             </div>
         </a-col>
     </a-row>
@@ -91,9 +95,11 @@
 <script>
 import { ref, reactive, toRefs, onBeforeMount } from "vue";
 // API
-import { MenuCreate, MenuListTree, MenuList } from "@/api/menu";
+import { MenuCreate, MenuListTree, MenuList, MenuDetailed, MenuUpdate, MenuRemove } from "@/api/menu";
 // antdesign
 import { message } from 'ant-design-vue';
+// utils
+import { requestDataFormat } from "@/utils/formatData";
 export default {
     name: "Menu",
     components: {},
@@ -107,7 +113,8 @@ export default {
             ],
             menu_type: "",
             menu_id: 0,
-            submit_loading: false
+            submit_loading: false,
+            spinning: false
         })
         const form = reactive({
             field: {
@@ -132,16 +139,22 @@ export default {
         })
         /** 菜单添加 */
         const handlerCategory = (type, menu_id) => {
-            console.log(menu_id);
             // 标记类型
             data.menu_type = type;
             // 菜单ID
             data.menu_id = menu_id || 0;
+            // 重置表单
             handlerRrsetFeild();
+            //
+            if(data.menu_type === "category_edit") {
+                handlerMenuDetailed();
+            }
         }
         /** 表单提交 */
         const handleFinish = () => {
+            if(data.menu_type === "category_edit") { handlerMenuEdit(); }
             if(data.menu_type === "first_category_add" || data.menu_type === "child_category_add") { handlerFirstCategoryAdd(); }
+        
         }
         /** 一级菜单添加 */
         const handlerFirstCategoryAdd = () => {
@@ -164,13 +177,11 @@ export default {
         const handlerRrsetFeild = () => {
             formDom.value.resetFields();
         }
-
         const getMenuListTree = () => {
             MenuListTree().then(response => {
                 data.tree_data = response.content;
             })
         }
-
         const getMenuList = () => {
             MenuList().then(response => {
                 const response_data = response.content;
@@ -206,44 +217,48 @@ export default {
             }
             return tree;
         }
-/**
-component: "f"
-hidden: null
-icon: ""
-keep: "0"
-lang: "en"
-menu_id: 11
-menu_name_cn: "ff"
-menu_name_en: "f"
-parent_id: 0
-redirect: ""
-router_name: "f"
-router_path: null
-sort: 0
 
+        /**
+         * 获取菜单详情
+         */
+        const handlerMenuDetailed = () => {
+            if(data.spinning) { return false; }
+            // 添加表单的遮罩
+            data.spinning = true;
+            MenuDetailed({menu_id: data.menu_id}).then(response => {
+                console.log(response.content)
+                requestDataFormat({
+                    data: response.content,
+                    form: form.field
+                })
+                data.spinning = false;
+            }).catch(error => {
+                data.spinning = false;
+            })
+        }
 
-component: "df"
-hidden: null
-icon: ""
-keep: "0"
-lang: "en"
-menu_id: 12
-menu_name_cn: "dfdf"
-menu_name_en: "df"
-parent_id: 11
-redirect: ""
-router_name: "df"
-router_path: null
-sort: 0
+        /**
+         * 修改菜单
+         */
+        const handlerMenuEdit = () => {
+            data.submit_loading = true;
+            MenuUpdate({...form.field, menu_id: data.menu_id}).then(response => {
+                data.submit_loading = false;
+                message.success("修改成功");
+                handlerRrsetFeild();
+                data.menu_type = "";
+                getMenuList();
+            })
+        }
 
-
-
- */
-
-
-
-
-
+        /**
+         * 删除菜单
+         */
+        const handlerMenuDel = (id) => {
+            MenuRemove({menu_id: id}).then(resonse => {
+                getMenuList();
+            })
+        }
 
         onBeforeMount(() => {
             // getMenuListTree();
@@ -260,7 +275,8 @@ sort: 0
             ...(toRefs(form)),
             handleFinish,
             formDom,
-            handlerCategory
+            handlerCategory,
+            handlerMenuDel
         }
     }
 }
