@@ -43,7 +43,7 @@
         <template #operation="{ record }">
             <div id="components-button-demo-basic">
             <a-button type="primary" @click="handlerEdit(record)">编辑</a-button>
-            <a-button @click="deleteConfirm(record);">删除</a-button>
+            <a-button @click="handlerDeleteConfirm(record);">删除</a-button>
             <a-button type="danger">详情</a-button>
             </div>
         </template>
@@ -60,17 +60,17 @@
 
 <script>
 import ModalUser from "@/components/Modal/User";
-import { ref, reactive, onMounted, createVNode } from "vue";
+import { ref, reactive, onMounted, createVNode, getCurrentInstance } from "vue";
 // API
 import { UserList, UserRemove, UserStatus } from "@/api/user";
 // antd
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import { Modal, message } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 export default {
     name: "",
     components: { ModalUser },
     props: {},
     setup(props){
+        const { proxy } = getCurrentInstance();
         const data = reactive({
             dataSource: [],
             columns: [
@@ -211,20 +211,11 @@ export default {
             })
         }
         // delete
-        const deleteConfirm = (params) => {
-            Modal.confirm({
-                title: '温馨提示',
-                icon: createVNode(ExclamationCircleOutlined),
-                content: '确认删除此信息，删除后无法恢复？',
-                okText: '确认',
-                okType: 'danger',
-                cancelText: '取消',
-                onOk() {
-                    if(params) { data.delete_id = params.member_id; }
-                    deleteApi();
-                },
-                onCancel() {},
-            });
+        const handlerDeleteConfirm = (params) => {
+            if(params) { data.delete_id = params.member_id; }
+            proxy.deleteConfirm({
+                ok_fun: () => deleteApi()
+            })
         }
         const deleteApi = () => {
             UserRemove({"member_id": data.delete_id}).then(response => {
@@ -244,7 +235,7 @@ export default {
             form_data,
             rowSelection,
             handlerEdit,
-            deleteConfirm,
+            handlerDeleteConfirm,
             handlerSwitch,
             getUserList,
             handlerSearch,

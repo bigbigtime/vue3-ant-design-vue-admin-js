@@ -13,7 +13,7 @@
                         <div class="button-group">
                             <a-button class="button-mini" type="primary" @click="handlerCategory('child_category_add', menu_id)">添加子菜单</a-button>
                             <a-button class="button-mini" @click="handlerCategory('category_edit', menu_id)">编辑</a-button>
-                            <a-button class="button-mini" @click="handlerMenuDel(menu_id)">删除</a-button>
+                            <a-button class="button-mini" @click="handlerDelete(menu_id)">删除</a-button>
                         </div>
                     </div>
                 </template>
@@ -53,8 +53,6 @@
                         class="avatar-uploader"
                         :show-upload-list="false"
                         action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                        :before-upload="beforeUpload"
-                        @change="handleChange"
                     >
                         <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
                         <div v-else>
@@ -79,6 +77,28 @@
                 <a-form-item label="重定向" name="redirect">
                     <a-input  v-model:value="field.redirect"/>
                 </a-form-item>
+                <a-form-item label="页面元素" name="redirect">
+                    <a-row :gutter="16">
+                        <a-col class="gutter-row" :span="8">
+                            元素
+                        </a-col>
+                        <a-col class="gutter-row" :span="8">
+                            标识
+                        </a-col>
+                    </a-row>
+                    <a-row :gutter="16" v-for="(item, index) in data.elem_item" :key="item.id">
+                        <a-col class="gutter-row" :span="8">
+                            <a-input v-model:value.trim="item.label" />
+                        </a-col>
+                        <a-col class="gutter-row" :span="8">
+                            <a-input v-model:value.trim="item.value"/>
+                        </a-col>
+                        <a-col class="gutter-row" :span="8">
+                            <a-button @click="handlerElemDel(index)">删除</a-button>
+                        </a-col>
+                    </a-row>
+                    <a-button size="small" @click="handlerElemAdd">添加页面功能</a-button>
+                </a-form-item>
                 <a-form-item :wrapper-col="{ span: 14, offset: 8 }">
                     <a-button type="primary" html-type="submit" :disabled="!data.menu_type" :loading="data.submit_loading">
                         确定{{ data.menu_type === "category_edit" ? "修改" : "添加" }}
@@ -93,7 +113,7 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs, onBeforeMount } from "vue";
+import { ref, reactive, toRefs, onBeforeMount, getCurrentInstance } from "vue";
 // API
 import { MenuCreate, MenuListTree, MenuList, MenuDetailed, MenuUpdate, MenuRemove } from "@/api/menu";
 // antdesign
@@ -105,6 +125,8 @@ export default {
     components: {},
     props: {},
     setup(){
+        const { proxy } = getCurrentInstance();
+        const json = { label: "", value: "" };
         const data = reactive({
             tree_data: [],
             isOptions: [
@@ -114,7 +136,9 @@ export default {
             menu_type: "",
             menu_id: 0,
             submit_loading: false,
-            spinning: false
+            spinning: false,
+            row_id: 0,
+            elem_item: [JSON.parse(JSON.stringify(json))]
         })
         const form = reactive({
             field: {
@@ -162,7 +186,9 @@ export default {
             // parent_id
             const request_data = {};
             if(data.menu_type === "child_category_add") { request_data.parent_id = data.menu_id; }
-            MenuCreate({...form.field, ...request_data}).then(response => {
+            // 页面元素数据参数
+            const elem_data = JSON.stringify(formatElemData());
+            MenuCreate({...form.field, ...request_data, elem: elem_data}).then(response => {
                 data.submit_loading = false;
                 message.success("添加成功");
                 handlerRrsetFeild();
@@ -176,6 +202,7 @@ export default {
         const formDom = ref(null);
         const handlerRrsetFeild = () => {
             formDom.value.resetFields();
+            data.elem_item = [JSON.parse(JSON.stringify(json))]
         }
         const getMenuListTree = () => {
             MenuListTree().then(response => {
@@ -192,6 +219,7 @@ export default {
                     child: "children",
                     root: 0
                 });
+                console.log(response_data)
             })
         }
 
@@ -226,12 +254,16 @@ export default {
             // 添加表单的遮罩
             data.spinning = true;
             MenuDetailed({menu_id: data.menu_id}).then(response => {
-                console.log(response.content)
                 requestDataFormat({
                     data: response.content,
                     form: form.field
                 })
                 data.spinning = false;
+                // 页面元素
+                let elem_data = response.content.elem;
+                if(elem_data) {
+                    data.elem_item = JSON.parse(elem_data);
+                }
             }).catch(error => {
                 data.spinning = false;
             })
@@ -242,7 +274,9 @@ export default {
          */
         const handlerMenuEdit = () => {
             data.submit_loading = true;
-            MenuUpdate({...form.field, menu_id: data.menu_id}).then(response => {
+            // 页面元素数据参数
+            const elem_data = JSON.stringify(formatElemData());
+            MenuUpdate({...form.field, menu_id: data.menu_id, elem: elem_data}).then(response => {
                 data.submit_loading = false;
                 message.success("修改成功");
                 handlerRrsetFeild();
@@ -254,10 +288,38 @@ export default {
         /**
          * 删除菜单
          */
-        const handlerMenuDel = (id) => {
-            MenuRemove({menu_id: id}).then(resonse => {
+        const handlerDelete = (id) => {
+            data.row_id = id;
+            proxy.deleteConfirm({
+                ok_fun: () => handlerDeleteApi()
+            });
+            
+        }
+
+        const handlerDeleteApi = () => {
+            MenuRemove({menu_id: data.row_id}).then(resonse => {
                 getMenuList();
             })
+        }
+
+        /** 添加页面元素功能 */
+        const handlerElemAdd = () => {
+            data.elem_item.push(JSON.parse(JSON.stringify(json)))
+        }
+        /** 删除页面元素功能 */
+        const handlerElemDel = (index) => {
+            data.elem_item.splice(index, 1);
+        }
+        /** 页面元素数据格式化 */
+        const formatElemData = () => {
+            const elem_data = JSON.parse(JSON.stringify(data.elem_item));
+            const arr = [];
+            elem_data.forEach(item => {
+                if(item.label && item.value) {
+                    arr.push(item);
+                }
+            })
+            return arr;
         }
 
         onBeforeMount(() => {
@@ -276,7 +338,9 @@ export default {
             handleFinish,
             formDom,
             handlerCategory,
-            handlerMenuDel
+            handlerDelete,
+            handlerElemAdd,
+            handlerElemDel
         }
     }
 }

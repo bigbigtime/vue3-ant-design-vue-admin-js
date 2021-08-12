@@ -16,6 +16,8 @@ import VueI18n from "./language";
 import SvgIcon from "@/components/Svgicon";
 // svg文件解析
 import "./js/svg";
+// 全局方法
+import GlobalFun from "@/utils/global";
 
 const app = createApp(App);
 // 注入Axios
@@ -26,5 +28,6 @@ app
   .use(router)
   .use(Antd)
   .use(VueI18n)
+  .use(GlobalFun)
   .component("svg-icon", SvgIcon)
   .mount("#app");
